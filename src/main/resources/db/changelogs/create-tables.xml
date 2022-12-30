@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+		http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+  <changeSet  id="1"  author="x958415">
+    <createTable  tableName="action">
+      <column  name="id"  type="bigint"  autoIncrement="true">
+        <constraints  primaryKey="true"  nullable="false"/>
+      </column>
+      <column  name="bean_name"  type="varchar(50)">
+        <constraints  nullable="false"/>
+      </column>
+      <column  name="debug"  type="boolean" defaultValueBoolean="false">
+        <constraints  nullable="false"/>
+      </column>
+    </createTable>
+
+    <addUniqueConstraint
+      columnNames="bean_name"
+      constraintName="unique_beanname"
+      tableName="action"
+      validate="true"/>
+
+    <createTable  tableName="execution">
+      <column  name="id"  type="uuid">
+        <constraints  primaryKey="true"  nullable="false"/>
+      </column>
+      <column  name="global_execution_id"  type="uuid">
+        <constraints nullable="false"/>
+      </column>
+      <column  name="state_machine_name"  type="varchar(50)">
+        <constraints  nullable="false"/>
+      </column>
+      <column  name="last_activity_id"  type="uuid">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <createTable  tableName="activity">
+      <column  name="id"  type="uuid">
+        <constraints  primaryKey="true"  nullable="false"/>
+      </column>
+      <column  name="global_execution_id"  type="uuid">
+        <constraints nullable="false"/>
+      </column>
+      <column  name="state_machine_id"  type="uuid">
+        <constraints nullable="true"/>
+      </column>
+      <column  name="activity_log"  type="varchar(250)">
+        <constraints  nullable="false"/>
+      </column>
+      <column  name="execute"  type="boolean" defaultValueBoolean="true">
+        <constraints  nullable="false"/>
+      </column>
+    </createTable>
+
+    <createTable  tableName="state">
+      <column  name="id"  type="bigint">
+        <constraints  primaryKey="true"  nullable="false"/>
+      </column>
+      <column  name="state_name"  type="varchar(50)">
+        <constraints  nullable="false"/>
+      </column>
+      <column  name="initial_state"  type="boolean" defaultValueBoolean="false">
+        <constraints  nullable="false"/>
+      </column>
+      <column  name="action_id"  type="bigint">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint
+      baseColumnNames="action_id"
+      baseTableName="state"
+      constraintName="fk_state_action"
+      onDelete="RESTRICT"
+      onUpdate="RESTRICT"
+      referencedColumnNames="id"
+      referencedTableName="action"
+      validate="true"/>
+
+    <addUniqueConstraint
+      columnNames="state_name"
+      constraintName="unique_statename"
+      tableName="state"
+      validate="true"/>
+
+    <createTable  tableName="transition">
+      <column  name="id"  type="uuid">
+        <constraints  primaryKey="true"  nullable="false"/>
+      </column>
+      <column  name="transition_name"  type="varchar(50)">
+        <constraints  nullable="false"/>
+      </column>
+      <column  name="to_state_id"  type="bigint">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint
+      baseColumnNames="to_state_id"
+      baseTableName="transition"
+      constraintName="fk_state_transition"
+      onDelete="RESTRICT"
+      onUpdate="RESTRICT"
+      referencedColumnNames="id"
+      referencedTableName="state"
+      validate="true"/>
+
+    <addUniqueConstraint
+      columnNames="transition_name"
+      constraintName="unique_transitionname"
+      tableName="transition"
+      validate="true"/>
+
+    <createTable  tableName="state_machine">
+      <column  name="id"  type="uuid">
+        <constraints  primaryKey="true"  nullable="false"/>
+      </column>
+      <column  name="initial_transition"  type="boolean" defaultValueBoolean="false">
+        <constraints  nullable="false"/>
+      </column>
+      <column  name="state_machine_name"  type="varchar(50)">
+        <constraints  nullable="false"/>
+      </column>
+      <column  name="current_transition_id"  type="uuid">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint
+      baseColumnNames="current_transition_id"
+      baseTableName="state_machine"
+      constraintName="fk_statemachine_transition"
+      onDelete="RESTRICT"
+      onUpdate="RESTRICT"
+      referencedColumnNames="id"
+      referencedTableName="transition"
+      validate="true"/>
+
+    <createTable  tableName="execution_activity">
+      <column  name="activity_id"  type="uuid">
+        <constraints  primaryKey="true"  nullable="false"/>
+      </column>
+      <column  name="execution_id"  type="uuid">
+        <constraints  primaryKey="true" nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint
+      baseColumnNames="activity_id"
+      baseTableName="execution_activity"
+      constraintName="fk_execution_activity1"
+      onDelete="RESTRICT"
+      onUpdate="RESTRICT"
+      referencedColumnNames="id"
+      referencedTableName="activity"
+      validate="true"/>
+    <addForeignKeyConstraint
+      baseColumnNames="execution_id"
+      baseTableName="execution_activity"
+      constraintName="fk_execution_activity2"
+      onDelete="RESTRICT"
+      onUpdate="RESTRICT"
+      referencedColumnNames="id"
+      referencedTableName="execution"
+      validate="true"/>
+
+    <createTable  tableName="state_machine_next_transitions">
+      <column  name="state_machine_id"  type="uuid">
+        <constraints  primaryKey="true"  nullable="false"/>
+      </column>
+      <column  name="next_transitions"  type="varchar(50)">
+        <constraints  primaryKey="true" nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint
+      baseColumnNames="state_machine_id"
+      baseTableName="state_machine_next_transitions"
+      constraintName="fk_stateMachine_nextTransition"
+      onDelete="RESTRICT"
+      onUpdate="RESTRICT"
+      referencedColumnNames="id"
+      referencedTableName="state_machine"
+      validate="true"/>
+
+    <addForeignKeyConstraint
+      baseColumnNames="next_transitions"
+      baseTableName="state_machine_next_transitions"
+      constraintName="fk_stateMachine_nextTransition2"
+      onDelete="RESTRICT"
+      onUpdate="RESTRICT"
+      referencedColumnNames="transition_name"
+      referencedTableName="transition"
+      validate="true"/>
+
+  </changeSet>
+</databaseChangeLog>

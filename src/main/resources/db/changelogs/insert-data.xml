@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+		http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+  <changeSet  id="2"  author="x958415">
+
+    <insert tableName="action">
+      <column name="id" value="1" />
+      <column name="bean_name" value="test.class" />
+    </insert>
+
+    <insert tableName="state">
+      <column name="id" value="1" />
+      <column name="state_name" value="CREATED" />
+      <column name="initial_state" value="true" />
+    </insert>
+    <insert tableName="state">
+      <column name="id" value="2" />
+      <column name="state_name" value="VALIDATION" />
+      <column name="initial_state" value="false" />
+      <column name="action_id" value="1" />
+    </insert>
+
+    <insert tableName="transition">
+      <column name="id" value="656637dc-8759-11ed-a1eb-0242ac120002" />
+      <column name="transition_name" value="initial" />
+      <column name="to_state_id" value="1" />
+    </insert>
+    <insert tableName="transition">
+      <column name="id" value="656637dc-8759-11ed-a1eb-0242ac120003" />
+      <column name="transition_name" value="validation" />
+      <column name="to_state_id" value="2" />
+    </insert>
+
+    <insert tableName="state_machine">
+      <column name="id" value="a9a5e310-8773-11ed-a1eb-0242ac120002" />
+      <column name="initial_transition" value="true" />
+      <column name="state_machine_name" value="Directive-1" />
+      <column name="current_transition_id" value="656637dc-8759-11ed-a1eb-0242ac120002" />
+    </insert>
+    <insert tableName="state_machine">
+      <column name="id" value="a6a5e450-8773-11ed-a1eb-0242ac120002" />
+      <column name="initial_transition" value="false" />
+      <column name="state_machine_name" value="Directive-1" />
+      <column name="current_transition_id" value="656637dc-8759-11ed-a1eb-0242ac120003" />
+    </insert>
+
+    <insert tableName="state_machine_next_transitions">
+      <column name="state_machine_id" value="a9a5e310-8773-11ed-a1eb-0242ac120002" />
+      <column name="next_transitions" value="validation" />
+    </insert>
+
+  </changeSet>
+</databaseChangeLog>
