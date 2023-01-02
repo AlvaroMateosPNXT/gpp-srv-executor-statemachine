@@ -9,6 +9,7 @@ import com.pagonxt.gpp.executor.repository.model.Execution;
 import com.pagonxt.gpp.executor.repository.model.ExecutionActivity;
 import com.pagonxt.gpp.executor.repository.model.ExecutionActivityKey;
 import com.pagonxt.gpp.executor.repository.model.StateMachine;
+import com.pagonxt.gpp.executor.service.ActivityService;
 import com.pagonxt.gpp.executor.service.ExecutionService;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,27 +20,14 @@ import org.springframework.stereotype.Service;
 public class ExecutionServiceImpl implements ExecutionService {
 
   @Autowired
-  ActivityRepository activityRepository;
-
-  @Autowired
-  ExecutionActivityRepository executionActivityRepository;
-
-  @Autowired
   ExecutionRepository executionRepository;
 
-  @Override
-  public Activity saveActivity(Activity activity) {
-    return activityRepository.save(activity);
-  }
+  @Autowired
+  ActivityService activityService;
 
   @Override
   public Execution saveExecution(Execution execution) {
     return executionRepository.save(execution);
-  }
-
-  @Override
-  public ExecutionActivity saveExecutionActivity(ExecutionActivity executionActivity) {
-    return executionActivityRepository.save(executionActivity);
   }
 
   @Override
@@ -58,23 +46,21 @@ public class ExecutionServiceImpl implements ExecutionService {
       activity.setActivityLog(String.format("Execution duplicate for globalExecutionId: %s",
           globalId));
       activity.setExecute(false);
-      Activity savedActivity = saveActivity(activity);
-      saveExecutionActivity(
-          new ExecutionActivity(new ExecutionActivityKey(savedActivity.getId(),exec.getId())));
+      activityService.saveActivityAndExecution(exec, activity);
     }, () -> {
 
       activity.setActivityLog(String.format("Transition executed: %s",
           stateMachine.getCurrentTransition().getTransitionName()));
       activity.setExecute(true);
       activity.setStateMachine(stateMachine);
-      Activity savedActivity = saveActivity(activity);
+      Activity savedActivity = activityService.saveActivity(activity);
 
       Execution savedExecution = saveExecution(
           new Execution(
               globalId,
               stateMachine.getStateMachineName(),
               savedActivity));
-      saveExecutionActivity(
+      activityService.saveExecutionActivity(
           new ExecutionActivity(new ExecutionActivityKey(savedActivity.getId(),savedExecution.getId())));
     });
   }

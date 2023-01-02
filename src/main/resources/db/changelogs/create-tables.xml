@@ -59,6 +59,9 @@
       <column  name="execute"  type="boolean" defaultValueBoolean="true">
         <constraints  nullable="false"/>
       </column>
+      <column  name="creation_date"  type="datetime">
+        <constraints  nullable="false"/>
+      </column>
     </createTable>
 
     <createTable  tableName="state">

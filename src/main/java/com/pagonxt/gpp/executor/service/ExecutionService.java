@@ -10,11 +10,9 @@ import java.util.UUID;
 
 public interface ExecutionService {
 
-  Activity saveActivity (Activity activity);
+
 
   Execution saveExecution (Execution execution);
-
-  ExecutionActivity saveExecutionActivity (ExecutionActivity executionActivity);
 
   Optional<Execution> findExecutionByGlobalExecutionId (UUID globalExecutionId);
 

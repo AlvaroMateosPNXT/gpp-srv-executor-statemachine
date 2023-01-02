@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -24,6 +25,8 @@ public class Activity {
 
   private String activityLog;
 
+  private Date creationDate;
+
   @OneToOne(targetEntity = StateMachine.class, cascade = CascadeType.ALL)
   @Embedded
   private StateMachine stateMachine;
@@ -35,6 +38,7 @@ public class Activity {
   public Activity(UUID globalExecutionId, StateMachine stateMachine) {
     this.globalExecutionId = globalExecutionId;
     this.stateMachine = stateMachine;
+    this.creationDate = new Date();
   }
 
   public Activity() {
@@ -70,5 +74,13 @@ public class Activity {
 
   public void setStateMachine(StateMachine stateMachine) {
     this.stateMachine = stateMachine;
+  }
+
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
   }
 }
